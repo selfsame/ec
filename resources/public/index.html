@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <link href="css/ce.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="js/constants.js"></script>
+    <script type="text/javascript" src="js/required.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src='js/lib/pixi.min.js'></script>
+    <script type="text/javascript" src='js/lib/Perlin.js'></script>
+    <script type="text/javascript" src='js/lib/pathfinding.min.js'></script>
+    <script type="text/javascript" src="js/components/standard.js"></script>
+    <script type="text/javascript" src="js/components/pixi/standard.js"></script>
+    <script type="text/javascript" src="js/components/joe.js"></script>
+  </head>
+  <body>
+    <script>
+
+E.mandate(C.new.transform);
+
+makeActor = function(name){
+  return E(name,
+    C.new.actor(),
+    C.new.sprite({
+      image:"place/ball-shadow.png",
+      x:-32, y:4, alpha:0.7}),
+    C.new.sprite({image:"place/ball.png"}),
+    C.new.wander());}
+
+makeMapLayer = function(name, opts){
+  return E(name,
+    C.new.grid(),
+    C.new.background(opts));}
+
+actors = E("actors", makeActor("joe"))
+
+for (var i=0;i<2000;i++){actors.add(makeActor("colonist"));}
+
+map = E("map",
+  makeMapLayer("terrain", {o:32}),
+  actors)
+
+ui = E("ui",
+  C.new.rect({fill:0x7cb3ff, h:30, w:WIDTH}),
+  C.new.text({text:"This is the UI"}),
+  C.new.text({text:"camera keys: arrows, '+' '-'", x:400}))
+
+root = E("game",
+  C.new.loop(),
+  C.new.renderer({w: window.screen.width, h: window.screen.height}),
+  C.new.camera({target:"map"}),
+  map, 
+  ui)
+
+PIXI.loader
+  .add('assets/place.json')
+  .add('assets/place.png')
+  .add('assets/atlas.json')
+  .add('assets/atlas.png')
+  .load(function(){
+    console.debug("- assets loaded");
+    window.eventListen();
+    E.mount(root);});
+
+    </script>
+  </body>
+</html>
+
