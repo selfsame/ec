@@ -1,7 +1,20 @@
 window.locals = function(o){var _o = new Array();for(k in o){if(o.hasOwnProperty(k)){_o.push(k);}}return _o;}
 
-window.____c = function(o, v){return new o['constructor'](v);}
-window.____pc = function(o, v){return new o['prototype']['constructor'](v);}
+window.____c = function(o, v){
+  if (v){
+    return new o['constructor'](v)}
+  else {
+    return new o['constructor']()}}
+
+window.____pc = function(o, v){
+  var ctor = o['prototype']['constructor'];
+  if (v){
+    
+    res = new (Function.prototype.bind.apply(ctor, [null].concat(v)))();
+    console.log("____pc", v, res);
+    return res;}
+  else {
+    return new ctor()}}
 
 window.ec_hello = function ()
  {if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1)

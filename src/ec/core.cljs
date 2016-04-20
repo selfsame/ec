@@ -364,7 +364,7 @@
 
 (defn C [bind data protocols]
   (let [ctor (if (fn? data)
-               (fn [] (js/____pc data))
+               (fn [] (js/____pc data (get protocols "args")))
                (fn [] data))
         valid-protocols
         (select-keys (js->clj protocols) (map clj->js (keys proto-map)))
