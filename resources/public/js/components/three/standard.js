@@ -1,16 +1,31 @@
+is = function(col, x){return (col.indexOf(x) != -1)}
+choose = function(m){return m[parseInt(Math.random()*m.length)]}
 
 white = new THREE.MeshLambertMaterial({color:0xdddddd})
-box = new THREE.BoxGeometry( 200, 200, 200 )
-sphere = new THREE.SphereGeometry(70,32,16)
+box = new THREE.BoxGeometry( 40, 40, 40 )
+sphere = new THREE.SphereGeometry(40,32,16)
+plane = new THREE.PlaneGeometry(10000,10000)
+
+width = window.innerWidth
+height = window.innerHeight
 
 C("renderer",
- {w:1500, h:900},
+ {w:1500, h:900, shadowmap:true},
  {init: function(c){
-    c.i = new THREE.WebGLRenderer()
+    c.i = renderer = new THREE.WebGLRenderer();
+    c.i.shadowMap.enabled = c.shadowmap;
     c.i.setSize(c.w, c.h)},
   mount: function(c){
     c.scene = c.owner.findComponents("scene")[0].i
-    c.camera = c.owner.findComponents("camera")[0].i
+    c.camera = (c.owner.findComponents("camera")[0] || c.owner.findComponents("orthocamera")[0]).i
+
+
+      renderer.shadowCameraNear = 3;
+      renderer.shadowCameraFar = c.camera.far;
+      renderer.shadowCameraFov = 50;
+      renderer.shadowMapBias = 0.0039;
+      renderer.shadowMapDarkness = 0.5;
+
     document.body.appendChild(c.i.domElement)},
   update: function(c){
     if (c.camera){
@@ -22,111 +37,70 @@ C("scene",
     scene = c
     c.i = new THREE.Scene;
     c.i.add(new THREE.AmbientLight(0x1d1d1d))
-    c.i.add(new THREE.DirectionalLight(0xffffff, 0.725))
-  }})
+
+    light = new THREE.DirectionalLight( 0xffffff, 0.8);
+    light.position.set( 0, 1000, 00 );
+    light.target.position.set( 0, 0, 0 );
+    light.castShadow = true;
+    light.shadow = new THREE.DirectionalLightShadow( new THREE.PerspectiveCamera( 50, 1, 1200, 2500 ) );
+    light.shadow.bias = 0.0001;
+    light.shadow.mapSize.width = 2048;
+    light.shadow.mapSize.height = 2048;
+    light.castShadow = true;
+    c.i.add(light)
+  },
+  mount:function(c){
+    c.i.add(c.owner.transform.i)}})
 
 C("camera", 
- {fov:75, aspect:2, near: 1, far:1000},
+ {fov:45, aspect:width/height, near: 1, far:99000},
  {init: function(c){
+    camera = c
     c.i = new THREE.PerspectiveCamera(c.fov, c.aspect, c.near, c.far);
-    c.i.position.z = 600;},
+    c.i.position.z = 2000;
+    c.i.position.y = 1200;},
   mount: function(c){
     var r = c.owner.findComponents("renderer");
-    c.i.aspect = r.w/r.h;},
-  update: function(c){}})
+    c.i.aspect = r.w/r.h;
+    c.target = c.owner},
+  update: function(c){
+    if (c.target){c.i.lookAt(c.target.transform.i.position)}
+    var dx = 0
+    if (is(KEYS, 37)) {dx -= 1}
+    if (is(KEYS, 39)) {dx += 1}
+    c.i.translateX(dx * 50)
+    var dz = 0
+    if (is(KEYS, 38)) {dz -= 1}
+    if (is(KEYS, 40)) {dz += 1}
+    c.i.translateZ(dz * 50)}})
+
+C("orthocamera", 
+ {},
+ {init: function(c){
+    camera = c
+    c.i = new THREE.OrthographicCamera( width / - 1, width / 1, height / 1, height / - 1, 1, 9000 );
+    c.i.position.y = 1200;
+    c.i.rotation.x = -.7;}})
 
 C("mesh", 
- {geometry:sphere},
+ {x:0,y:0,z:0},
  {init: function(c){
-    c.i = new THREE.Mesh(c.geometry, (c.material || white))},
+    c.i = new THREE.Mesh(c.geometry || sphere, (c.material || white))
+    c.i.castShadow = true;
+    c.i.recieveShadow = true;
+    c.i.position.set(c.x, c.y, c.z)
+    if (c.rotation){
+      c.i.rotation.x = (c.rotation.x || c.i.rotation.x)
+      c.i.rotation.y = (c.rotation.y || c.i.rotation.y)
+      c.i.rotation.z = (c.rotation.z || c.i.rotation.z) }},
   mount: function(c){
-    var s = c.owner.findAncestorComponents("scene")[0] || 
-      c.owner.findComponents("scene")[0];
-    xx = c;
-    if (s){s.i.add(c.i)}}})
+    c.owner.transform.i.add(c.i);}})
 
 
-// C("transform",
-//   {},
-//  {expose: ["position","scale","rotation","parent","children","visible","alpha"],
-//   mount: function(c) {
-//     if (c.owner.owner){
-//       c.owner.owner.transform.addChild(c);}},
-//   unmount: function(c) {
-//     if (c.parent){c.parent.removeChild(c.instance);}}})
-
-
-// C("sprite",
-//  {image: "", alpha:1.0, x:0, y:0 },
-//  {init: function(c){},
-//   mount: function(c){
-//     if (c.image){
-//       c.instance = new PIXI.Sprite.fromImage(c.image);;} 
-//     else {
-//       c.instance = new PIXI.Sprite();}
-//     c.instance.x = c.x; c.instance.y = c.y;
-//     c.instance.alpha = c.alpha;
-//     c.owner.transform.addChild(c.instance);},
-//   unmount: function(c){
-//     c.instance.parent.removeChild(c.instance);}})
-
-
-// C("text",
-//  {text:"hello world",
-//   font : '24px Arial',
-//   fill : 0x000000,
-//   align : 'center',
-//   x:0, y:0},
-//  {init: function(c){
-//     c.instance = new PIXI.Text(c.text, c);
-//     c.instance.x = c.x;
-//     c.instance.y = c.y;},
-//   mount: function(c){
-//     c.owner.transform.addChild(c.instance);},
-//   unmount: function(c){
-//     c.instance.parent.removeChild(c.instance);}})
-
-
-// C("rect",
-//  {x:0, y:0, 
-//   w:0, h:0,
-//   fill : 0xffffff,
-//   alpha: 1.0},
-//  {init: function(c){
-//     c.instance = new PIXI.Graphics();
-//     c.instance.beginFill(c.fill, c.alpha);
-//     c.instance.drawRect(c.x, c.y, c.w, c.h);
-//     c.instance.endFill();},
-//   mount: function(c){
-//     c.owner.transform.addChild(c.instance);},
-//   unmount: function(c){
-//     c.instance.parent.removeChild(c.instance);}})
-
-
-// C("pivotgizmo",
-//  {fill : 0xff0000,
-//   alpha: 1.0,
-//   radius: 10},
-//  {init: function(c){
-//     c.instance = new PIXI.Graphics;
-//     c.instance.beginFill(c.fill, c.alpha);
-//     c.instance.drawCircle(c.x, c.y, c.radius);
-//     c.instance.endFill();},
-//   mount: function(c){
-//     c.owner.transform.addChild(c.instance);},
-//   update: function(c){
-//     c.instance.x = c.owner.transform.pivot.x;
-//     c.instance.y = c.owner.transform.pivot.y;
-//     c.owner.transform.setChildIndex(c.instance, c.owner.transform.children.length - 1);},
-//   unmount: function(c){
-//     c.instance.parent.removeChild(c.instance);}})
-
-
-// C("drawsort",
-//  {fn:function(a, b){ return a.position.y - b.position.y; }},
-//  {update:
-//   function(c){
-//     c.owner.transform.children.sort(c.fn);}})
-
-
-
+C("transform", {},
+ {init: function(c){c.i = new THREE.Object3D;},
+  mount: function(c) {
+    if (c.owner.owner){
+      c.owner.owner.transform.i.add(c.i);}},
+  unmount: function(c) {
+    if (c.i.parent){c.i.parent.remove(c.i);}}})

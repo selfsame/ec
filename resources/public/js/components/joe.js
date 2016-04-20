@@ -1,29 +1,36 @@
-C("actor", {},
- {mount: function(c){
-    c.owner.transform.x = Math.random() * WIDTH;
-    c.owner.transform.y = Math.random() * HEIGHT; },
-  update: function(c){
-   if (c.owner.transform.x > WIDTH){c.owner.transform.x = 0}
-   if (c.owner.transform.x < 0){c.owner.transform.x = WIDTH}
-   if (c.owner.transform.y > WIDTH){c.owner.transform.y = 0}
-   if (c.owner.transform.y < 0){c.owner.transform.y = HEIGHT}}})
+C("position_wrap", 
+  {x:1000, y: 1000, z:1000},
+ {update: function(c){
+   if (c.owner.transform.i.position.x > c.x){c.owner.transform.i.position.x = -c.x}
+   if (c.owner.transform.i.position.x < -c.x){c.owner.transform.i.position.x = c.x}
+   if (c.owner.transform.i.position.y >  c.y){c.owner.transform.i.position.y = -c.y}
+   if (c.owner.transform.i.position.y < -c.y){c.owner.transform.i.position.y = c.y}
+   if (c.owner.transform.i.position.z >  c.z){c.owner.transform.i.position.z = -c.z}
+   if (c.owner.transform.i.position.z < -c.z){c.owner.transform.i.position.z = c.z}}})
 
-
-C("wander", {speed:2},
+C("wander", 
+ {speed:2},
  {init: function(c){
-    c.vx = (Math.random()-0.5) * 3;
-    c.vy = (Math.random()-0.5) * 3;},
+    c.vx = (Math.random()-0.5) * 3 * c.speed;
+    c.vz = (Math.random()-0.5) * 3 * c.speed;},
   update: function(c){
     c.vx = std.cap(c.vx + (Math.random()- 0.5) * 0.1, -3, 3)
-    c.vy = std.cap(c.vy + (Math.random()- 0.5) * 0.1, -3, 3)
-    c.owner.transform.x += c.vx;
-    c.owner.transform.y += c.vy; }});
+    c.vz = std.cap(c.vz + (Math.random()- 0.5) * 0.1, -3, 3)
+    c.owner.transform.i.position.x += c.vx
+    c.owner.transform.i.position.z += c.vz}});
 
+C("scatter", 
+  {x:0, y:0, z: 0},
+  {mount: function(c){
+    c.owner.transform.i.position.x += Math.random()*(c.x*2) - c.x
+    c.owner.transform.i.position.y += Math.random()*(c.y*2) - c.y
+    c.owner.transform.i.position.z += Math.random()*(c.z*2) - c.z}})
 
 C("oscillate", 
  {axis:"x", speed:10, distance:10},
  {update: function(c) {
-     c.owner.transform[c.axis] += Math.sin(new Date() * 0.01 / c.speed) * (c.distance * .1);}})
+    var x = c.owner.transform.i.position.x;
+    c.owner.transform.i.position.setX(x + Math.sin(new Date() * 0.01 / c.speed) * (c.distance * .1))}})
 
 
 C("grid",

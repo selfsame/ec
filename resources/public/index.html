@@ -1,68 +1,57 @@
-<html>
-  <head>
-    <link href="css/ce.css" type="text/css" rel="stylesheet">
-    <script type="text/javascript" src="js/constants.js"></script>
-    <script type="text/javascript" src="js/required.js"></script>
-    <script type="text/javascript" src="main.js"></script>
-    <script type="text/javascript" src='js/lib/three.min.js'></script>
-    <script type="text/javascript" src='js/lib/Perlin.js'></script>
-    <script type="text/javascript" src='js/lib/pathfinding.min.js'></script>
-    <script type="text/javascript" src="js/components/standard.js"></script>
-    <script type="text/javascript" src="js/components/three/standard.js"></script>
-    <script type="text/javascript" src="js/components/joe.js"></script>
-  </head>
-  <body>
-    <script>
+<html><head>
+  <link href="css/ce.css" type="text/css" rel="stylesheet">
+  <script type="text/javascript" src="js/constants.js"></script>
+  <script type="text/javascript" src="js/required.js"></script>
+  <script type="text/javascript" src="main.js"></script>
+  <script type="text/javascript" src='js/lib/three.min.js'></script>
+  <script type="text/javascript" src='js/lib/Perlin.js'></script>
+  <script type="text/javascript" src='js/lib/pathfinding.min.js'></script>
+  <script type="text/javascript" src="js/components/standard.js"></script>
+  <script type="text/javascript" src="js/components/three/standard.js"></script>
+  <script type="text/javascript" src="js/components/joe.js"></script>
+</head><body><script>
 
-red = new THREE.MeshLambertMaterial({color:0xff0000})
-box = new THREE.BoxGeometry( 100, 100, 100 )
-
-// E.mandate(C.new.transform);
+E.mandate(C.new.transform);
 
 makeActor = function(name){
-  return E(name)
-    // C.new.actor())
-    // C.new.sprite({
-    //   image:"place/ball-shadow.png",
-    //   x:-32, y:4, alpha:0.7}),
-    // C.new.sprite({image:"place/ball.png"}),
-    // C.new.wander()
-}
+  return E(name,
+    C.new.mesh({geometry: sphere, material: white}),
+    C.new.scatter({x:5000,z:5000}),
+    C.new.position_wrap({x:5000,z:5000}),
+    C.new.wander({speed:Math.random()*20+5}))}
 
 makeMapLayer = function(name, opts){
-  return E(name
-    // C.new.grid(),
-    // C.new.background(opts));
-)}
+  return E(name,
+    C.new.grid(),
+    C.new.mesh({
+      geometry:plane, material:ground, 
+      y:-50, rotation:{x:-1.5708}}))}
 
-actors = E("actors", makeActor("joe"))
+function init(){
+  actors = E("actors")
+  for (var i=0;i<2000;i++){actors.add(makeActor("colonist"));}
+  map = E("map",
+    makeMapLayer("terrain", {o:32}),
+    actors)
 
-for (var i=0;i<2000;i++){actors.add(makeActor("colonist"));}
+  root = E("game",
+    C.new.loop(),
+    C.new.camera(),
+    C.new.scene(),
+    C.new.renderer({w: window.innerWidth, h: window.innerHeight}),
+    map)
 
-map = E("map",
-  makeMapLayer("terrain", {o:32}),
-  // C.new.mesh({geometry:box, material:red}),
-  actors)
+    window.eventListen()
+    E.mount(root)}
 
-ui = E("ui"
-  // C.new.rect({fill:0x7cb3ff, h:30, w:WIDTH}),
-  // C.new.text({text:"This is the UI"}),
-  // C.new.text({text:"camera keys: arrows, '+' '-'", x:400}
-    )
+new THREE.TextureLoader().load(
+  "assets/ground.png",
+  function(tex){
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(20,20);
+    ground = new THREE.MeshLambertMaterial({map:tex})
+    init()})
 
-root = E("game",
-  C.new.loop(),
-  C.new.camera(),
-  C.new.scene(),
-  C.new.mesh({material:red}),
-  C.new.renderer({w: window.innerWidth, h: window.innerHeight}),
-  map, 
-  ui)
-
-window.eventListen();
-E.mount(root);
-
-    </script>
-  </body>
-</html>
+</script></body></html>
 
