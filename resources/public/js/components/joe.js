@@ -1,12 +1,12 @@
 C("position_wrap", 
   {x:1000, y: 1000, z:1000},
  {update: function(c){
-   if (c.owner.transform.i.position.x > c.x){c.owner.transform.i.position.x = -c.x}
-   if (c.owner.transform.i.position.x < -c.x){c.owner.transform.i.position.x = c.x}
+   if (c.owner.transform.i.position.x >  c.x){c.owner.transform.i.position.x = -c.x}
+   if (c.owner.transform.i.position.x < -c.x){c.owner.transform.i.position.x =  c.x}
    if (c.owner.transform.i.position.y >  c.y){c.owner.transform.i.position.y = -c.y}
-   if (c.owner.transform.i.position.y < -c.y){c.owner.transform.i.position.y = c.y}
+   if (c.owner.transform.i.position.y < -c.y){c.owner.transform.i.position.y =  c.y}
    if (c.owner.transform.i.position.z >  c.z){c.owner.transform.i.position.z = -c.z}
-   if (c.owner.transform.i.position.z < -c.z){c.owner.transform.i.position.z = c.z}}})
+   if (c.owner.transform.i.position.z < -c.z){c.owner.transform.i.position.z =  c.z}}})
 
 C("wander", 
  {speed:2},
@@ -29,21 +29,20 @@ C("scatter",
 C("oscillate", 
  {axis:"x", speed:10, distance:10},
  {update: function(c) {
-    var x = c.owner.transform.i.position.x;
-    c.owner.transform.i.position.setX(x + Math.sin(new Date() * 0.01 / c.speed) * (c.distance * .1))}})
-
+    c.owner.transform.i.position[c.axis] += 
+      x + Math.sin(new Date() * 0.01 / c.speed)
+        * (c.distance * .1)}})
 
 C("grid",
- {w:TILEWIDTH,
-  h:TILEHEIGHT,
+ {w:200, h:200,
   datatype: Array,
-  data: false,
-  notfound: false,
+  data: false, 
+  nf: false,
   get: function(x, y){
     var c = this;
     var idx = (y - 1) * c.w + x;
     var found = c.data[idx];
-    if (found == undefined){return c.notfound;} else {return c.data[idx];} },
+    if (found == undefined){return c.nf;} else {return c.data[idx];} },
   set: function(x, y, v){
     var c = this;
     var idx = (y - 1) * c.w + x;
@@ -56,6 +55,8 @@ C("grid",
       f(i, x, y); }}},
  {init: function(c){
   c.data = new c.datatype(c.w * c.h);}});
+
+
 
 
 C("background",
@@ -85,4 +86,5 @@ C("background",
        tile.position.y = point[1] * TILESIZE;
        c.instance.addChild(tile);}})
     c.owner.transform.addChild(c.instance);}});
+
 

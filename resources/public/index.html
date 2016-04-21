@@ -1,11 +1,8 @@
 <html><head>
   <link href="css/ce.css" type="text/css" rel="stylesheet">
-  <script type="text/javascript" src="js/constants.js"></script>
   <script type="text/javascript" src="js/required.js"></script>
   <script type="text/javascript" src="main.js"></script>
   <script type="text/javascript" src='js/lib/three.min.js'></script>
-  <script type="text/javascript" src='js/lib/Perlin.js'></script>
-  <script type="text/javascript" src='js/lib/pathfinding.min.js'></script>
   <script type="text/javascript" src="js/components/standard.js"></script>
   <script type="text/javascript" src="js/components/three/standard.js"></script>
   <script type="text/javascript" src="js/components/joe.js"></script>
@@ -28,21 +25,18 @@ makeMapLayer = function(name, opts){
       y:-50, rotation:{x:-1.5708}}))}
 
 function init(){
-  actors = E("actors")
-  for (var i=0;i<2000;i++){actors.add(makeActor("colonist"));}
-  map = E("map",
-    makeMapLayer("terrain", {o:32}),
-    actors)
-
+  window.eventListen()
+  var actors = E("actors")
+  for (var i=0;i<2000;i++){actors.add(makeActor("ball"))}
   root = E("game",
     C.new.loop(),
     C.new.camera(),
     C.new.scene(),
-    C.new.renderer({w: window.innerWidth, h: window.innerHeight}),
-    map)
-
-    window.eventListen()
-    E.mount(root)}
+    C.new.renderer({w: width, h: height}),
+    E("map",
+      makeMapLayer("terrain", {o:32}),
+      actors))
+  E.mount(root)}
 
 new THREE.TextureLoader().load(
   "assets/ground.png",
@@ -54,4 +48,5 @@ new THREE.TextureLoader().load(
     init()})
 
 </script></body></html>
+
 
