@@ -2,20 +2,18 @@
 C("renderer",
  {w:1500, h:900},
  {init: function(c){
-    c.instance = new PIXI.WebGLRenderer(c.w, c.h);
-    document.body.appendChild(c.instance.view);},
+    c.instance = new PIXI.WebGLRenderer(c.w, c.h)},
   mount: function(c){
-    document.body.appendChild(c.instance.view);},
+    document.body.appendChild(c.instance.view)},
   unmount: function(c){
     c.instance.view.parentNode.removeChild(c.instance.view);},
   update: function(c){
-    c.instance.render(c.owner.transform);}})
+    c.instance.render(c.owner.transform)}})
 
 
 C("transform",
   PIXI.Container,
- {expose: ["position","scale","rotation","parent","children","visible","alpha"],
-  mount: function(c) {
+ {mount: function(c) {
     if (c.owner.owner){
       c.owner.owner.transform.addChild(c);}},
   unmount: function(c) {

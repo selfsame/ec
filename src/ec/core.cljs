@@ -294,6 +294,8 @@
   "add"
   {:doc " [o] mounts a component or entity."
    :value (fn [v]
+            (if (array? v)
+              (.map v #((aget o "add") %)))
             (if-let [uid (-uid v)]
               (if-let [obj (-o uid)]
                 (if (instance? Ent obj)
