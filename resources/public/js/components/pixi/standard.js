@@ -1,4 +1,3 @@
-
 C("renderer",
  {w:1500, h:900},
  {init: function(c){
@@ -10,7 +9,6 @@ C("renderer",
   update: function(c){
     c.instance.render(c.owner.transform)}})
 
-
 C("transform",
   PIXI.Container,
  {mount: function(c) {
@@ -18,7 +16,6 @@ C("transform",
       c.owner.owner.transform.addChild(c);}},
   unmount: function(c) {
     if (c.parent){c.parent.removeChild(c.instance);}}})
-
 
 C("sprite",
  {image: "", alpha:1.0, x:0, y:0 },
@@ -34,6 +31,11 @@ C("sprite",
   unmount: function(c){
     c.instance.parent.removeChild(c.instance);}})
 
+C("drawsort",
+ {fn:function(a, b){ return a.position.y - b.position.y; }},
+ {update:
+  function(c){
+    c.owner.transform.children.sort(c.fn);}})
 
 C("text",
  {text:"hello world",
@@ -50,7 +52,6 @@ C("text",
   unmount: function(c){
     c.instance.parent.removeChild(c.instance);}})
 
-
 C("rect",
  {x:0, y:0, 
   w:0, h:0,
@@ -65,6 +66,7 @@ C("rect",
     c.owner.transform.addChild(c.instance);},
   unmount: function(c){
     c.instance.parent.removeChild(c.instance);}})
+
 
 
 C("pivotgizmo",
@@ -86,11 +88,7 @@ C("pivotgizmo",
     c.instance.parent.removeChild(c.instance);}})
 
 
-C("drawsort",
- {fn:function(a, b){ return a.position.y - b.position.y; }},
- {update:
-  function(c){
-    c.owner.transform.children.sort(c.fn);}})
+
 
 
 
